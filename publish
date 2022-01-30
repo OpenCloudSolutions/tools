@@ -1,0 +1,24 @@
+#! /bin/bash
+
+prog=${0##}
+dir=$(pwd)
+cmd_dir=$dir/cmd/*.bash
+destination_dir=$dir/bin
+
+echo -e "Copying files to ${destination_dir}"
+# Prepare and move all cmds to /bin 
+for file in $cmd_dir; do
+    # break down filename
+    filename=${file##*/}
+    name=${filename%.*}
+    
+    # start copy
+    echo -e "\tMoving ${file}"
+    cp ${file} $destination_dir/$name
+done
+
+# Make all the files in /bin executable
+echo -e "Setting script permissions"
+for file in $destination_dir; do chmod -R 755 $file ; done
+echo -e "Done" && exit 0
+
