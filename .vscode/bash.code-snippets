@@ -1,0 +1,20 @@
+{
+"New bash script starter": {
+	"prefix": "nbf",
+	"body": [
+		"#! /bin/bash",
+		"#",
+		"#",
+		"#",
+		"#",
+		"#",
+		"#",
+		"# author: Nick Sladic",
+		"",
+		"prog=${0##/}",
+		"",
+		"echo $prog"
+	],
+	"description": "New bash script starter"
+}
+}

@@ -1,35 +1,32 @@
 #! /bin/bash
+#
+# This is a terraform wrapper that adds some flexibility
+# to the open cloud solution's projects. It ensures the
+# current directory has the correct version of terraform
+# It also sets the proper project credentials relative path
+#
+# author: Nick Sladic
 
-prog=${0##}
+prog=${0##*/}
 
-set -u
+# Retrieve the defined terraform version
+version=$(expand *.tf | grep "required_version =*" \
+    | tr -d '[:space:]' | sed -e 's/required_version=\"~>//g' -e 's/\"//g')
 
-env=dev
-terraform=$(which terraform)
-current_gcloud_config=~/.config/gcloud/configurations/ocs-${env}-default_account.json
-terraform_gcloud_config=~/.config/gcloud/configurations/ocs-${env}-default_service_account.json
-
-if [[ ! -f $current_gcloud_config ]]; then 
-    echo "No default configuration found"
-    exit 1
+if [[ -z "${version}" ]]; then 
+    echo "${prog}: couldn't find any terraform files" >&2
+    exit 1;
 fi
 
-if [[ ! -f $terraform_gcloud_config ]]; then
-    echo "No terraform service account found ${terraform_gcloud_config}"    
-    exit 1
+version="${version%.*}"
+
+if [[ ! -f $(which "terraform-${version}") ]]; then
+    echo "Required terraform-${version} not found. Use \"get-tf\" to download terraform" >&2
+    exit 2
 fi
 
-# verify terraform version control file is defined
-if [[ ! -f version.tf ]]; then  
-    echo "No terraform version.tf found in current directory"
-    exit 1 2>1
+# Check for the specific "version" defined in the version file
+if [[ -z $(which "terraform-${version}" | :) ]]; then
+        tf_exe=$(which "terraform-${version}")
+        exec $tf_exe "$@"
 fi
-# switch to terraform service account
-gcloud auth activate-service-account -q --key-file ${terraform_gcloud_config} &> /dev/null
-
-# execute terraform and forward args
-${terraform} $@ 
-
-# switch back to default service account
-gcloud auth activate-service-account -q --key-file ${current_gcloud_config} &> /dev/null
-

@@ -1,0 +1,135 @@
+#! /usr/bin/env bash
+
+prog="${0##*/}"
+
+usage="\
+        ${prog} -v <TERRAFORM_VERSION> [v,d]
+
+        -v      The specified version of terraform to retrieve (REQUIRED)
+        -h      Display usage (OPTIONAL)
+        -d      Sets debugger (OPTIONAL)
+        -a      Installs ARM binary (default x86)
+        -p      Path to install the binary to (default /usr/local/bin)
+"
+
+perequisites() {
+
+    if [[ ! -f $(which wget) ]]; then
+        echo "${prog}: \"wget\" not installed, please install curl before running this againt" >&2
+        exit 1
+    fi
+
+    if [[ ! -f $(which unzip) ]]; then
+        echo "${prog}: \"unzip\" not installed, please install curl before running this againt" >&2
+        exit 1
+    fi
+}
+
+optstrings="v:p:ahd"
+export debug=0
+export version=0
+export amd=0
+export binary_path="/usr/local/bin"
+while getopts "${optstrings}" OPT; do
+    case "$OPT" in 
+        v)
+            version="$OPTARG"
+            ;;
+        d)
+            debug=1
+            set -x
+            ;;
+        h)
+            echo "$usage" >&2
+            exit 0
+            ;;
+        p)
+            binary_path="$OPTARG"
+            ;;
+        *)
+            echo "$usage" >&2
+            exit 0
+            ;;
+    esac
+done
+shift $(("$OPTIND" - 1))
+
+if [[ -z $version ]]; then
+    echo "Please provide a valid terraform version"
+    exit 1;
+fi
+# Check prereqs
+perequisites
+
+# Find out what machine type is being used
+if [[ $(uname -o) == "Darwin" ]]; then
+    os="darwin"
+elif [[ $(uname -o) == "linux" ]]; then
+    os="linux"
+fi
+
+if [[ $(uname -m ) == "x86_64" ]]; then
+    machine_type="amd64"
+elif [[ $(uname -o) == "arm" ]]; then
+    machine_type="arm"
+fi
+
+
+
+# prepare install directory
+tmp_dir="/tmp/${prog}.$$"
+
+# set up a command to run on signal to ensure directory clean up
+trap "rm -rf ${tmp_dir:?}" 0
+mkdir -p "${tmp_dir}"
+pushd "${tmp_dir}" &> /dev/null
+terraform_fn="terraform-${version}.zip"
+# terraform links
+tf_uri="https://releases.hashicorp.com/terraform/${version}/terraform_${version}_${machine_type}_${os}.zip \
+    https://releases.hashicorp.com/terraform/${version}/terraform_${version}_SHA256SUMS \
+    https://releases.hashicorp.com/terraform/${version}/terraform_${version}_SHA256SUMS.sig"
+
+pushd "$install_dir" &> /dev/null
+
+echo "$machine_type"
+echo "$os"
+
+wget "${tf_uri}"
+
+exit 0
+# {
+#     wget "$terraform_amd" -O "$terraform_fn" -q
+#     curl_code=$?
+#     if (( "$debug" )); then
+#         echo "curl_code: ${curl_code}"
+#     fi
+# }
+
+# if [[ ! -f "${install_dir}/${terraform_fn}" ]]; then
+#     popd &> /dev/null
+#     echo "Failed to install ${terraform_amd}"; exit 1;
+# fi
+
+# # Unzip the binary
+# unzip "${terraform_fn}" 
+# if [[ ! -f "${terraform_fn}" ]]; then
+#     popd &> /dev/null
+#     echo "Failed to unzip ${terraform_fn}"; exit 1;
+# fi
+
+# if [[ -f "${install_dir}/terraform" ]]; then
+#     mv "${install_dir}/terraform" "terraform-${version}"
+#     if [[ ! -d "${binary_path}" ]]; then
+#         popd &> /dev/null
+#         echo "Failed to rename ${terraform_fn}"; exit 1;
+#     fi
+#     mv "${install_dir}/terraform-${version}" "$binary_path"
+# fi
+
+# popd &> /dev/null
+
+# {
+#     rm "${install_dir}/${terraform_fn%*.zip}"
+#     rm "${install_dir}/${terraform_fn}"
+#     rmdir "${install_dir}"
+# }

@@ -1,0 +1,38 @@
+#! /bin/bash
+#
+# This script temporarily switches the cloud account
+# to the terraform service account to deploy gcp
+# resources
+#
+# author: Nick Sladic
+
+
+env=dev
+terraform=$(which terraform)
+current_gcloud_config=~/.config/gcloud/configurations/oclouds-${env}-default-sa.json
+terraform_gcloud_config=~/.config/gcloud/configurations/oclouds-${env}-terraform-sa.json
+
+if [[ ! -f $current_gcloud_config ]]; then
+    echo "No default configuration found"
+    exit 1
+fi
+
+if [[ ! -f $terraform_gcloud_config ]]; then
+    echo "No terraform service account found ${terraform_gcloud_config}"
+    exit 1
+fi
+
+# verify terraform version control file is defined
+if [[ ! -f version.tf ]]; then
+    echo "No terraform version.tf found in current directory"
+    exit 1
+fi
+# switch to terraform service account
+gcloud auth activate-service-account -q --key-file ${terraform_gcloud_config} &> /dev/null
+
+# execute terraform and forward args
+${terraform} "$@"
+
+# switch back to default service account
+gcloud auth activate-service-account -q --key-file ${current_gcloud_config} &> /dev/null
+

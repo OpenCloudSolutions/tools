@@ -2,8 +2,8 @@
 
 prog=${0##}
 dir=$(pwd)
-cmd_dir=$dir/cmd/*.bash
-destination_dir=$dir/bin
+cmd_dir="${dir}/cmd/*.bash"
+destination_dir="${dir}/bin"
 
 echo -e "Copying files to ${destination_dir}"
 # Prepare and move all cmds to /bin 
@@ -14,7 +14,7 @@ for file in $cmd_dir; do
     
     # start copy
     echo -e "\tMoving ${file}"
-    cp ${file} $destination_dir/$name
+    cp "${file}" "${destination_dir}/${name}"
 done
 
 # Make all the files in /bin executable

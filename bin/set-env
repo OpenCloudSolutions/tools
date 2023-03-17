@@ -1,0 +1,12 @@
+#! /bin/bash
+#
+#
+#
+#
+#
+#
+# author: Nick Sladic
+
+prog=${0##/}
+
+echo prog

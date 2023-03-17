@@ -1,0 +1,38 @@
+#! /bin/bash
+
+prog=${0##*/}
+
+usage="\
+        ${prog} -b <BACKEND> [b]
+
+        -b      Set the backend provider type for the state file
+"
+env=$(get-env-dir)
+
+getopt_flags=":b:"
+files=("main.tf" "version.tf" "terraform.tfvars" "variables.tf" "version.tf" "state.tf")
+
+backend="gcs"
+while getopts "${getopt_flags}" OPT; do
+    case $OPT in 
+    b)
+        backend=$OPTARG
+        ;;
+    *)
+        echo "$usage" >&2
+        exit 1
+        ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+# TODO make arguments for project & modules specific resources (instances, static ips, dns, etc)
+
+for file in "${files[@]}"; do
+    if [[ ! -e ${file} ]]; then
+        echo -e "Creating... ${file}"
+        touch "${file}" # creates template terraform files
+    fi
+done
+
+
