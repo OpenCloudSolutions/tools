@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env -S bash -e
 #
 # This is a terraform wrapper that adds some flexibility
 # to the open cloud solution's projects. It ensures the

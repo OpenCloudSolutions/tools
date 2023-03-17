@@ -1,6 +1,7 @@
-#! /bin/bash
+#! /usr/bin/env -S bash -e
 
 prog=${0##}
+
 dir=$(pwd)
 cmd_dir="${dir}/cmd/*.bash"
 destination_dir="${dir}/bin"
