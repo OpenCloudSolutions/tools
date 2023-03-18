@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env -S bash -e
 #
 # This with get the relative hierarchal enivronment
 # inside the terraform-projects
@@ -29,7 +29,7 @@ while [[ $cur_dir ]]; do
     fi
 done
 
-if [[ exe_status < 1 ]]; then
+if (( exe_status < 1 )); then
     exit "$exe_status"
 fi
 

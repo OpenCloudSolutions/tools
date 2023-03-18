@@ -1,15 +1,15 @@
 #! /usr/bin/env -S bash -e
 
 f_module_main_tf() {
-cat <<- EoF > main.tf 
+cat <<- EoF > main.tf
 resource "" "" {
-    name = var.name
+  name = var.name
 }
 EoF
 }
 
 f_project_main_tf() {
-cat <<- EoF > main.tf 
+cat <<- EoF > main.tf
 module "" {
   name   = var.name
   region = var.region
@@ -32,7 +32,7 @@ EoF
 }
 
 f_project_backend() {
-cat <<- EoF > backend.tf 
+cat <<- EoF > backend.tf
 terraform {
   backend "gcs" {}
 }
@@ -90,7 +90,7 @@ usage="\
         -b      Set the backend provider type for the state file
 "
 
-getopt_flags="b:m:p"
+getopt_flags="b:mp"
 export backend=""
 project=0
 module=0

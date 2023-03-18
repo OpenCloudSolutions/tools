@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env -S bash -e
 #
 # This script temporarily switches the cloud account
 # to the terraform service account to deploy gcp

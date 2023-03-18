@@ -3,7 +3,7 @@
 f_module_main_tf() {
 cat <<- EoF > main.tf
 resource "" "" {
-    name = var.name
+  name = var.name
 }
 EoF
 }
@@ -90,7 +90,7 @@ usage="\
         -b      Set the backend provider type for the state file
 "
 
-getopt_flags="b:m:p"
+getopt_flags="b:mp"
 export backend=""
 project=0
 module=0
